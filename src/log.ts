@@ -17,7 +17,7 @@ function whitespaceFor(value: any) {
 }
 
 function log(
-  message: string,
+  message: any,
   counterObj: CounterObj | null,
   timestamp: Date | null,
   newlineBefore: boolean
@@ -43,7 +43,7 @@ function log(
  *                     100 values are tracked concurrently, so indices will be inaccurate if >100
  *                     unique values are being logged at the same time.
  */
-export function logPrimary(message: string, counterObj?: CounterObj) {
+export function logPrimary(message: any, counterObj?: CounterObj) {
   log(message, counterObj ?? null, new Date(), true);
 }
 
@@ -53,7 +53,7 @@ export function logPrimary(message: string, counterObj?: CounterObj) {
  * @param message - The message to print
  * @param newlineBefore - Whether to print a newline before the log message
  */
-export function logSecondary(message: string, newlineBefore?: true) {
+export function logSecondary(message: any, newlineBefore?: boolean) {
   log(message, null, null, newlineBefore ?? false);
 }
 
