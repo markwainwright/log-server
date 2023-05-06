@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  log-server:
+    build:
+      context: .
+    container_name: log-server
+    environment:
+      - PORT=8080
+    ports:
+      - 8080:8080
