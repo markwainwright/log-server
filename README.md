@@ -5,7 +5,7 @@ A simple Node.js HTTP server that logs incoming connections and requests in a re
 ![Screenshot](doc/screenshot.png)
 
 The second column is a counter of TCP connections, making it easier to reason about which requests
-came in over which connection, for example to debug HTTP keep alive.
+came in over which connection, for example to troubleshoot HTTP keep alive.
 
 ## Install
 
