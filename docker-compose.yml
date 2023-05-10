@@ -1,11 +1,18 @@
 version: "3.8"
 
 services:
-  log-server:
+  log-server-http:
     build:
       context: .
-    container_name: log-server
-    environment:
-      - PORT=8080
+    container_name: log-server-http
+    command: ["http", "8080"]
     ports:
       - 8080:8080
+
+  log-server-tcp:
+    build:
+      context: .
+    container_name: log-server-tcp
+    command: ["tcp", "4444"]
+    ports:
+      - 4444:4444

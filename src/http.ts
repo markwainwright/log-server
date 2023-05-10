@@ -1,7 +1,8 @@
-import { createServer, IncomingMessage, ServerResponse } from "node:http";
+import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import type { AddressInfo } from "node:net";
 import { setTimeout } from "node:timers/promises";
 
-import { formatAddress, logPrimary, logSecondary } from "./log.js";
+import { logPrimary, logSecondary } from "./util/log.js";
 
 const PATH_SLEEP = "/sleep/";
 const PATH_STATUS = "/status/";
@@ -14,6 +15,23 @@ async function sendResponse<R extends IncomingMessage>(req: R, res: ServerRespon
   }
 
   res.end("ok");
+}
+
+export function formatAddress(address: AddressInfo | string | null) {
+  if (address === null) {
+    return "";
+  }
+
+  if (typeof address === "string") {
+    // Unix socket
+    return address;
+  }
+
+  if (address.family === "IPv6") {
+    return `http://[${address.address}]:${address.port}`;
+  }
+
+  return `http://${address.address}:${address.port}`;
 }
 
 const server = createServer();
@@ -45,5 +63,6 @@ server.on("connection", socket => {
 
 server.keepAliveTimeout = 0; // Remove `Keep-Alive` response header
 
-const port = parseInt(process.env.PORT || "", 10) || 8080;
-server.listen(port, () => logPrimary(`Listening on ${formatAddress("http", server.address())}`));
+export function createHttpServer(port: number) {
+  server.listen(port, () => logPrimary(`Listening on ${formatAddress(server.address())}`));
+}

@@ -1,4 +1,3 @@
-import type { AddressInfo } from "node:net";
 import { inspect } from "node:util";
 
 import { UniqueValueCounter } from "./unique-value-counter.js";
@@ -28,9 +27,7 @@ function log(
 
   console.log(
     timestamp ?? whitespaceForTimestamp,
-
     counterObj ? uniqueValueCounter.get(counterObj) + 1 : whitespaceFor(uniqueValueCounter.count()),
-
     message
   );
 }
@@ -53,23 +50,6 @@ export function logPrimary(message: string, counterObj?: CounterObj) {
  * @param message - The message to print
  * @param newlineBefore - Whether to print a newline before the log message
  */
-export function logSecondary(message: string, newlineBefore?: true) {
+export function logSecondary(message: string, newlineBefore?: boolean) {
   log(message, null, null, newlineBefore ?? false);
-}
-
-export function formatAddress(protocol: string, address: AddressInfo | string | null) {
-  if (address === null) {
-    return "";
-  }
-
-  if (typeof address === "string") {
-    // Unix socket
-    return address;
-  }
-
-  if (address.family === "IPv6") {
-    return `${protocol}://[${address.address}]:${address.port}`;
-  }
-
-  return `${protocol}://${address.address}:${address.port}`;
 }

@@ -22,6 +22,4 @@ COPY package.json ./
 COPY --from=builder /home/node/app/dist/ ./
 COPY --from=installer /home/node/app/node_modules/ ./node_modules/
 
-EXPOSE 8080
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["node", "index.js"]
+ENTRYPOINT ["/sbin/tini", "--", "node", "index.js"]
