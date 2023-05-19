@@ -1,4 +1,4 @@
-import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
+import { STATUS_CODES, createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import { setTimeout } from "node:timers/promises";
 
@@ -15,7 +15,7 @@ async function sendResponse<R extends IncomingMessage>(req: R, res: ServerRespon
   }
 
   res.setHeader("Content-Type", "text/plain; charset=utf-8");
-  res.end("ok");
+  res.end(STATUS_CODES[res.statusCode]);
 }
 
 export function formatAddress(address: AddressInfo | string | null) {
@@ -64,6 +64,6 @@ server.on("connection", socket => {
 
 server.keepAliveTimeout = 0; // Remove `Keep-Alive` response header
 
-export function createHttpServer(port: number) {
+export function startHttpServer(port: number) {
   server.listen(port, () => logPrimary(`Listening on ${formatAddress(server.address())}`));
 }
