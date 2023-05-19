@@ -86,6 +86,6 @@ server.on("connection", async socket => {
   }
 });
 
-export function createTcpServer(port: number) {
+export function startTcpServer(port: number) {
   server.listen(port, () => logPrimary(`Listening on ${formatAddress(server.address())}`));
 }

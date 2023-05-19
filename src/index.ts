@@ -1,5 +1,5 @@
-import { createHttpServer } from "./http.js";
-import { createTcpServer } from "./tcp.js";
+import { startHttpServer } from "./http.js";
+import { startTcpServer } from "./tcp.js";
 
 const DEFAULT_PORT = 8080;
 
@@ -17,11 +17,11 @@ function parseArgs(argv: string[]) {
 
   switch (mode) {
     case "http":
-      createHttpServer(port);
+      startHttpServer(port);
       return;
 
     case "tcp":
-      createTcpServer(port);
+      startTcpServer(port);
       return;
 
     default:
