@@ -1,7 +1,7 @@
-import { createServer, type AddressInfo } from "node:net";
+import { Socket, createServer, type AddressInfo } from "node:net";
 import { setTimeout } from "node:timers/promises";
 
-import { AsyncQueue } from "./util/async-queue.js";
+import { AsyncIterableQueue } from "./util/async-iterable-queue.js";
 import { logPrimary, logSecondary } from "./util/log.js";
 
 const COMMAND_PREFIX_ECHO = "echo ";
@@ -11,6 +11,18 @@ const COMMAND_RST = "rst";
 
 function isNodeError(error: unknown): error is NodeJS.ErrnoException {
   return error instanceof Error && "code" in error;
+}
+
+async function socketWrite(socket: Socket, data: string) {
+  if (socket.writable) {
+    await new Promise<void>((resolve, reject) =>
+      socket.write(data, "utf-8", error => (error ? reject(error) : resolve()))
+    );
+  }
+}
+
+function socketEnd(socket: Socket) {
+  return new Promise<void>(socket.end.bind(socket));
 }
 
 export function formatAddress(address: AddressInfo | string | null) {
@@ -35,7 +47,7 @@ const server = createServer();
 server.on("connection", async socket => {
   logPrimary("Connection opened", socket);
 
-  const linesQueue = new AsyncQueue<string>();
+  const linesQueue = new AsyncIterableQueue<string>();
 
   socket.on("data", async chunk => {
     const string = chunk.toString("utf-8");
@@ -55,16 +67,18 @@ server.on("connection", async socket => {
     }
   });
 
-  socket.on("close", () => logPrimary("Connection closed", socket));
+  socket.on("close", () => {
+    linesQueue.return();
+    logPrimary("Connection closed", socket);
+  });
 
   for await (const line of linesQueue) {
     if (line.startsWith(COMMAND_PREFIX_ECHO)) {
-      socket.write(line.substring(COMMAND_PREFIX_ECHO.length));
+      await socketWrite(socket, line.substring(COMMAND_PREFIX_ECHO.length));
     } else if (line.startsWith(COMMAND_PREFIX_SLEEP)) {
       await setTimeout(parseInt(line.substring(COMMAND_PREFIX_SLEEP.length), 10));
     } else if (line === COMMAND_FIN) {
-      socket.end();
-      break;
+      await socketEnd(socket);
     } else if (line === COMMAND_RST) {
       socket.resetAndDestroy();
       break;

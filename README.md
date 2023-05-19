@@ -52,6 +52,8 @@ $ curl http://localhost:8080/sleep/2000
 - `fin` - close the connection
 - `rst` - forcibly reset the connection
 
+Each newline-separated command will be queued and executed in order.
+
 e.g.
 
 ```sh
