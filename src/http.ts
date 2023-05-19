@@ -14,6 +14,7 @@ async function sendResponse<R extends IncomingMessage>(req: R, res: ServerRespon
     res.statusCode = parseInt(req.url.substring(PATH_STATUS.length), 10);
   }
 
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
   res.end("ok");
 }
 
