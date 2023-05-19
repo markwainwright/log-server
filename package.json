@@ -11,8 +11,8 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
-    "@tsconfig/node18": "^2.0.0",
-    "@types/node": "^18.16.4",
+    "@tsconfig/node18": "^2.0.1",
+    "@types/node": "^18.16.13",
     "nodemon": "^2.0.22",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
