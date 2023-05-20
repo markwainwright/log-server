@@ -1,21 +1,20 @@
 const RETURN_RESULT = { value: undefined, done: true } as const;
 
-class Node<T> {
+interface Node<T> {
   readonly value: T;
-  next: Node<T> | null = null;
-
-  constructor(value: T) {
-    this.value = value;
-  }
+  next: Node<T> | null;
 }
 
 /** Iterable LIFO queue, implemented as a linked list */
 export class IterableQueue<T> {
   #head: Node<T> | null = null;
   #tail: Node<T> | null = null;
+  #size = 0;
 
   enqueue(value: T): void {
-    const node = new Node(value);
+    const node = { value, next: null };
+
+    this.#size++;
 
     if (!this.#tail) {
       this.#head = this.#tail = node;
@@ -26,12 +25,18 @@ export class IterableQueue<T> {
     this.#tail = node;
   }
 
+  size() {
+    return this.#size;
+  }
+
   next(): IteratorResult<T, void> {
     const head = this.#head;
 
     if (!head) {
       return RETURN_RESULT;
     }
+
+    this.#size--;
 
     if (head.next) {
       this.#head = head.next;
@@ -44,6 +49,7 @@ export class IterableQueue<T> {
 
   return(): IteratorReturnResult<void> {
     this.#head = this.#tail = null;
+    this.#size = 0;
 
     return RETURN_RESULT;
   }
