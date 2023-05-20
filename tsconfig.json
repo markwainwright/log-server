@@ -1,5 +1,6 @@
 {
   "extends": "@tsconfig/node18",
+  "include": ["src", "test"],
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",
