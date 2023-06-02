@@ -1,6 +1,9 @@
 # `log-server`
 
-A simple Node.js HTTP or TCP server that logs incoming connections and requests in a readable way.
+A Node.js HTTP or TCP server that:
+
+- logs incoming connections and requests in a readable way
+- allows response behaviour to be customized on a per-request basis (see below)
 
 ![Screenshot](doc/screenshot.png)
 
@@ -11,7 +14,6 @@ in over which connection, for example to troubleshoot HTTP keep alive.
 
 ```sh
 npm ci
-npm start
 ```
 
 ## Run
@@ -30,14 +32,21 @@ npm start -- tcp 4444
 npm run start:watch
 ```
 
-## Customizing server behaviour
+## Customizing response behaviour
 
 ### HTTP mode
 
-- `GET /status/:code` - respond with that HTTP status code immediately
-- `GET /sleep/:duration` - respond with `200 OK` after that amount of milliseconds (after receiving
-  a full request)
-- `GET /*` - respond with `200 OK` immediately
+| Request path               | Respond with...                                                 |
+| -------------------------- | --------------------------------------------------------------- |
+| `/status/:code`            | Status `:code`                                                  |
+| `/sleep/headers/:duration` | Status 200 and body after `:duration` milliseconds              |
+| `/sleep/body/:duration`    | Status 200 immediately, and body after `:duration` milliseconds |
+| `/echo/:message`           | Status 200 with body set to `:message`                          |
+| `/echo`                    | Status 200 with body set to request body                        |
+| `/*`                       | Status 200                                                      |
+
+Supports compressed responses (`br`, `gzip`, `deflate`) according to `Accept-Encoding` request
+header.
 
 e.g.
 
@@ -47,12 +56,14 @@ $ curl http://localhost:8080/sleep/2000
 
 ### TCP mode
 
-- `sleep 2000` - sleep for 2 seconds before running the next command
-- `echo foo` - send `foo` back to the client
-- `fin` - close the connection
-- `rst` - forcibly reset the connection
+Each newline-separated command will be queued and executed in order:
 
-Each newline-separated command will be queued and executed in order.
+| Command      | Behaviour                                           |
+| ------------ | --------------------------------------------------- |
+| `sleep 2000` | Sleep for 2 seconds before running the next command |
+| `echo foo`   | Send `foo` back to the client                       |
+| `fin`        | Close the connection                                |
+| `rst`        | Forcibly reset the connection                       |
 
 e.g.
 

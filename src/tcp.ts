@@ -1,4 +1,4 @@
-import { Socket, createServer, type AddressInfo } from "node:net";
+import { createServer, type AddressInfo, type Socket } from "node:net";
 import { setTimeout } from "node:timers/promises";
 
 import { AsyncIterableQueue } from "./util/async-iterable-queue.js";
@@ -42,50 +42,50 @@ export function formatAddress(address: AddressInfo | string | null) {
   return `${address.address}:${address.port}`;
 }
 
-const server = createServer();
+export function startTcpServer(port: number) {
+  const server = createServer();
 
-server.on("connection", async socket => {
-  logPrimary("Connection opened", socket);
+  server.on("connection", async socket => {
+    logPrimary("Connection opened", socket);
 
-  const linesQueue = new AsyncIterableQueue<string>();
+    const linesQueue = new AsyncIterableQueue<string>();
 
-  socket.on("data", async chunk => {
-    const string = chunk.toString("utf-8");
+    socket.on("data", async chunk => {
+      const string = chunk.toString("utf-8");
 
-    logPrimary(JSON.stringify(string).replace(/(?:^"|"$)/g, ""), socket);
+      logPrimary(JSON.stringify(string).replace(/(?:^"|"$)/g, ""), socket);
 
-    for (const line of string.split(/\r?\n/)) {
-      if (line !== "") {
-        linesQueue.enqueue(line);
+      for (const line of string.split(/\r?\n/)) {
+        if (line !== "") {
+          linesQueue.enqueue(line);
+        }
+      }
+    });
+
+    socket.on("error", error => {
+      if (!isNodeError(error) || error.code !== "ECONNRESET") {
+        logSecondary(error.message, true);
+      }
+    });
+
+    socket.on("close", () => {
+      linesQueue.return();
+      logPrimary("Connection closed", socket);
+    });
+
+    for await (const line of linesQueue) {
+      if (line.startsWith(COMMAND_PREFIX_ECHO)) {
+        await socketWrite(socket, line.substring(COMMAND_PREFIX_ECHO.length));
+      } else if (line.startsWith(COMMAND_PREFIX_SLEEP)) {
+        await setTimeout(parseInt(line.substring(COMMAND_PREFIX_SLEEP.length), 10));
+      } else if (line === COMMAND_FIN) {
+        await socketEnd(socket);
+      } else if (line === COMMAND_RST) {
+        socket.resetAndDestroy();
+        break;
       }
     }
   });
 
-  socket.on("error", error => {
-    if (!isNodeError(error) || error.code !== "ECONNRESET") {
-      logSecondary(error.message, true);
-    }
-  });
-
-  socket.on("close", () => {
-    linesQueue.return();
-    logPrimary("Connection closed", socket);
-  });
-
-  for await (const line of linesQueue) {
-    if (line.startsWith(COMMAND_PREFIX_ECHO)) {
-      await socketWrite(socket, line.substring(COMMAND_PREFIX_ECHO.length));
-    } else if (line.startsWith(COMMAND_PREFIX_SLEEP)) {
-      await setTimeout(parseInt(line.substring(COMMAND_PREFIX_SLEEP.length), 10));
-    } else if (line === COMMAND_FIN) {
-      await socketEnd(socket);
-    } else if (line === COMMAND_RST) {
-      socket.resetAndDestroy();
-      break;
-    }
-  }
-});
-
-export function startTcpServer(port: number) {
   server.listen(port, () => logPrimary(`Listening on ${formatAddress(server.address())}`));
 }
