@@ -14,6 +14,7 @@ const PATH_ECHO_PATH = "/echo/";
 const PATH_ECHO_BODY = "/echo";
 
 const RESPONSE_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
   Vary: "Accept-Encoding",
 };
 const RESPONSE_HEADERS_ENTRIES = Object.entries(RESPONSE_HEADERS);
