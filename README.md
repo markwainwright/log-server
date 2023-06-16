@@ -26,7 +26,10 @@ npm start
 npm start -- http 80
 
 # Start server in TCP mode on port 4444:
-npm start -- tcp 4444
+npm start -- tcp
+
+# Start server in TCP mode on port 5555:
+npm start -- tcp 5555
 
 # Restart automatically when code changes (for development):
 npm run start:watch
