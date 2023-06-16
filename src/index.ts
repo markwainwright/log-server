@@ -1,15 +1,11 @@
 import { startHttpServer } from "./http.js";
 import { startTcpServer } from "./tcp.js";
 
-const DEFAULT_PORT = 8080;
-
 function parseArgs(argv: string[]) {
-  const [mode = "http", port] = argv.slice(2);
+  const [mode = "http", rawPort] = argv.slice(2);
+  const port = (rawPort ? parseInt(rawPort, 10) : 0) || (mode === "http" ? 8080 : 4444);
 
-  return {
-    mode: mode.toLowerCase(),
-    port: port ? parseInt(port, 10) || DEFAULT_PORT : DEFAULT_PORT,
-  };
+  return { mode, port };
 }
 
 (function main() {
