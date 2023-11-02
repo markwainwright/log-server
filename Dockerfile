@@ -1,6 +1,5 @@
-FROM node:18.16.0-alpine AS base
+FROM node:20.9.0-alpine AS base
 USER node
-RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
 
 FROM base as builder
