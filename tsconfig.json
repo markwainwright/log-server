@@ -1,10 +1,10 @@
 {
-  "extends": "@tsconfig/node18",
+  "extends": "@tsconfig/node20",
   "include": ["src", "test"],
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "noUncheckedIndexedAccess": true,
-    "outDir": "dist/"
+    "outDir": "dist"
   }
 }
