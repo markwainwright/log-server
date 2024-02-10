@@ -12,18 +12,18 @@
   "scripts": {
     "build": "tsc --project tsconfig.build.json",
     "start": "npm run build && node dist",
-    "start:watch": "nodemon -q --ext ts --exec \"ts-node --esm src/index.ts\"",
+    "start:watch": "NODE_OPTIONS=\"--loader ts-node/esm --no-warnings=ExperimentalWarning\" nodemon -q --ext ts src/index.ts",
     "test": "tap --reporter terse --passes --show-full-coverage --typecheck",
     "test:watch": "tap repl w on --passes"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
-    "@types/node": "^20.8.10",
-    "@types/tap": "^15.0.10",
-    "nodemon": "^3.0.1",
-    "tap": "^18.5.4",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "@types/node": "^20.11.17",
+    "@types/tap": "^15.0.11",
+    "nodemon": "^3.0.3",
+    "tap": "^18.7.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   },
   "tap": {
     "coverage-map": "./test-map.js"
