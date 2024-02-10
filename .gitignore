@@ -1,4 +1,7 @@
-node_modules
-dist
-coverage
 .tap
+certs/*
+!certs/.gitkeep
+coverage
+dist
+node_modules
+
