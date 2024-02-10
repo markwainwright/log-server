@@ -10,7 +10,7 @@ import { logPrimary, logSecondary } from "./util/log.js";
 const PATH_STATUS = "/status/";
 const PATH_SLEEP_BODY = "/sleep/body/";
 const PATH_SLEEP_HEADERS = "/sleep/headers/";
-const PATH_ECHO_PATH = "/echo/";
+const PATH_PRINT_PATH = "/print/";
 const PATH_ECHO_BODY = "/echo";
 
 const RESPONSE_HEADERS = {
@@ -56,8 +56,8 @@ async function handleRequest(res: ServerResponse) {
     let body: string | Readable = "OK";
 
     if (path) {
-      if (path.startsWith(PATH_ECHO_PATH)) {
-        body = path.substring(PATH_ECHO_PATH.length);
+      if (path.startsWith(PATH_PRINT_PATH)) {
+        body = path.substring(PATH_PRINT_PATH.length);
       } else if (path.startsWith(PATH_SLEEP_HEADERS)) {
         await setTimeout(parseInt(path.substring(PATH_SLEEP_HEADERS.length), 10));
       } else if (path.startsWith(PATH_SLEEP_BODY)) {
