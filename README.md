@@ -44,7 +44,7 @@ npm start -- [http|https|tcp] [port]
 | `/status/:code`            | Status `:code`                                                  |
 | `/sleep/headers/:duration` | Status 200 and body after `:duration` milliseconds              |
 | `/sleep/body/:duration`    | Status 200 immediately, and body after `:duration` milliseconds |
-| `/echo/:message`           | Status 200 with body set to `:message`                          |
+| `/print/:message`          | Status 200 with body set to `:message`                          |
 | `/echo`                    | Status 200 with body set to request body                        |
 | `/*`                       | Status 200                                                      |
 
@@ -61,15 +61,15 @@ $ curl http://localhost:8080/sleep/2000
 
 Each newline-separated command will be queued and executed in order:
 
-| Command      | Behaviour                                           |
-| ------------ | --------------------------------------------------- |
-| `sleep 2000` | Sleep for 2 seconds before running the next command |
-| `echo foo`   | Send `foo` back to the client                       |
-| `fin`        | Close the connection                                |
-| `rst`        | Forcibly reset the connection                       |
+| Command           | Behaviour                                                        |
+| ----------------- | ---------------------------------------------------------------- |
+| `sleep :duration` | Sleep for :duration milliseconds before running the next command |
+| `print :message`  | Send :message back to the client                                 |
+| `fin`             | Close the connection                                             |
+| `rst`             | Forcibly reset the connection                                    |
 
 e.g.
 
 ```sh
-$ printf "echo hello\nsleep 2000\necho  world\nsleep 1000\nfin" | nc localhost 4444
+$ printf "print hello\nsleep 2000\nprint  world\nsleep 1000\nfin" | nc localhost 4444
 ```

@@ -5,7 +5,7 @@ import { formatAddress } from "./format-address.js";
 import { AsyncIterableQueue } from "./util/async-iterable-queue.js";
 import { logPrimary, logSecondary } from "./util/log.js";
 
-const COMMAND_PREFIX_ECHO = "echo ";
+const COMMAND_PREFIX_PRINT = "print ";
 const COMMAND_PREFIX_SLEEP = "sleep ";
 const COMMAND_FIN = "fin";
 const COMMAND_RST = "rst";
@@ -58,8 +58,8 @@ export function startTcpServer(port = 4444) {
     });
 
     for await (const line of linesQueue) {
-      if (line.startsWith(COMMAND_PREFIX_ECHO)) {
-        await socketWrite(socket, line.substring(COMMAND_PREFIX_ECHO.length));
+      if (line.startsWith(COMMAND_PREFIX_PRINT)) {
+        await socketWrite(socket, line.substring(COMMAND_PREFIX_PRINT.length));
       } else if (line.startsWith(COMMAND_PREFIX_SLEEP)) {
         await setTimeout(parseInt(line.substring(COMMAND_PREFIX_SLEEP.length), 10));
       } else if (line === COMMAND_FIN) {
