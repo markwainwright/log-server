@@ -123,13 +123,15 @@ export function configureHttpServer(server: Server) {
   server.on("request", async (req, res) => {
     const { httpVersion, method, rawHeaders, socket, url: path } = req;
 
-    logPrimary(`${method} ${path} HTTP/${httpVersion}`, socket);
+    if (req.method !== "GET" || req.url !== "/favicon.ico") {
+      logPrimary(`${method} ${path} HTTP/${httpVersion}`, socket);
 
-    for (let i = 0; i < rawHeaders.length; i += 2) {
-      logSecondary(`${rawHeaders[i]}: ${rawHeaders[i + 1]}`);
+      for (let i = 0; i < rawHeaders.length; i += 2) {
+        logSecondary(`${rawHeaders[i]}: ${rawHeaders[i + 1]}`);
+      }
+
+      req.on("data", (chunk: Buffer) => logSecondary(chunk.toString(), true));
     }
-
-    req.on("data", (chunk: Buffer) => logSecondary(chunk.toString(), true));
 
     await handleRequest(res);
   });
