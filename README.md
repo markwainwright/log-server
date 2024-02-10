@@ -1,6 +1,6 @@
 # `log-server`
 
-A Node.js HTTP or TCP server that:
+A Node.js HTTP, HTTPS, or TCP server that:
 
 - logs incoming connections and requests in a readable way
 - allows response behaviour to be customized on a per-request basis (see below)
@@ -16,28 +16,28 @@ in over which connection, for example to troubleshoot HTTP keep alive.
 npm ci
 ```
 
+### Enable HTTPS support
+
+1. [Install mkcert](https://github.com/FiloSottile/mkcert?tab=readme-ov-file#installation)
+
+2. ```sh
+   mkcert -install
+   cd certs
+   mkcert localhost 127.0.0.1
+   ```
+
 ## Run
 
 ```sh
-# Start server in HTTP mode on port 8080:
-npm start
-
-# Start server in HTTP mode on port 80:
-npm start -- http 80
-
-# Start server in TCP mode on port 4444:
-npm start -- tcp
-
-# Start server in TCP mode on port 5555:
-npm start -- tcp 5555
-
-# Restart automatically when code changes (for development):
-npm run start:watch
+npm start -- [http|https|tcp] [port]
 ```
+
+- Mode defaults to `http`
+- Port defaults to 8080 in `http` mode, 8443 in `https` mode, or 4444 in `tcp` mode
 
 ## Customizing response behaviour
 
-### HTTP mode
+### `http` and `https` modes
 
 | Request path               | Respond with...                                                 |
 | -------------------------- | --------------------------------------------------------------- |
@@ -57,7 +57,7 @@ e.g.
 $ curl http://localhost:8080/sleep/2000
 ```
 
-### TCP mode
+### `tcp` mode
 
 Each newline-separated command will be queued and executed in order:
 
