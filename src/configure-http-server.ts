@@ -1,5 +1,5 @@
-import { STATUS_CODES, createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import type { AddressInfo } from "node:net";
+import { STATUS_CODES, type IncomingMessage, type Server, type ServerResponse } from "node:http";
+import { Socket } from "node:net";
 import { PassThrough, Readable, type Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { setTimeout } from "node:timers/promises";
@@ -108,26 +108,7 @@ async function sendResponse(res: ServerResponse, content: Readable | string, con
   }
 }
 
-export function formatAddress(address: AddressInfo | string | null) {
-  if (address === null) {
-    return "";
-  }
-
-  if (typeof address === "string") {
-    // Unix socket
-    return address;
-  }
-
-  if (address.family === "IPv6") {
-    return `http://[${address.address}]:${address.port}`;
-  }
-
-  return `http://${address.address}:${address.port}`;
-}
-
-export function startHttpServer(port: number) {
-  const server = createServer();
-
+export function configureHttpServer(server: Server) {
   server.on("request", async (req, res) => {
     const { httpVersion, method, rawHeaders, socket, url: path } = req;
 
@@ -143,7 +124,7 @@ export function startHttpServer(port: number) {
   });
 
   server.on("clientError", (err, socket) => {
-    logPrimary(`Client error: ${err.message}`, socket);
+    logPrimary(`Client error: ${err.message}`, socket instanceof Socket ? socket : undefined);
     socket.end("HTTP/1.1 400 Bad Request\r\nContent-Length: 0\r\n\r\n");
     socket.destroy(err);
   });
@@ -154,6 +135,4 @@ export function startHttpServer(port: number) {
   });
 
   server.keepAliveTimeout = 0; // Remove `Keep-Alive` response header
-
-  server.listen(port, () => logPrimary(`Listening on ${formatAddress(server.address())}`));
 }

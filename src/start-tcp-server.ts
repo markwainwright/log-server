@@ -1,6 +1,7 @@
-import { createServer, type AddressInfo, type Socket } from "node:net";
+import { createServer, type Socket } from "node:net";
 import { setTimeout } from "node:timers/promises";
 
+import { formatAddress } from "./format-address.js";
 import { AsyncIterableQueue } from "./util/async-iterable-queue.js";
 import { logPrimary, logSecondary } from "./util/log.js";
 
@@ -25,24 +26,7 @@ function socketEnd(socket: Socket) {
   return new Promise<void>(socket.end.bind(socket));
 }
 
-export function formatAddress(address: AddressInfo | string | null) {
-  if (address === null) {
-    return "";
-  }
-
-  if (typeof address === "string") {
-    // Unix socket
-    return address;
-  }
-
-  if (address.family === "IPv6") {
-    return `[${address.address}]:${address.port}`;
-  }
-
-  return `${address.address}:${address.port}`;
-}
-
-export function startTcpServer(port: number) {
+export function startTcpServer(port = 4444) {
   const server = createServer();
 
   server.on("connection", async socket => {
