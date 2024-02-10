@@ -7,15 +7,7 @@ import { createBrotliCompress, createDeflate, createGzip } from "node:zlib";
 
 import { logPrimary, logSecondary } from "./util/log.js";
 
-const PATH_STATUS = "/status/";
-const PATH_HEADER = "/header/";
-const PATH_SLEEP_BODY = "/sleep/body/";
-const PATH_SLEEP_HEADERS = "/sleep/headers/";
-const PATH_PRINT_PATH = "/print/";
-const PATH_ECHO_BODY = "/echo";
-
 const RESPONSE_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
   Vary: "Accept-Encoding",
 };
 const RESPONSE_HEADERS_ENTRIES = Object.entries(RESPONSE_HEADERS);
@@ -46,37 +38,48 @@ function parseAcceptEncoding(req: IncomingMessage): [string | null, Transform] {
 
 async function handleRequest(res: ServerResponse) {
   const { req } = res;
-  const path = req.url;
+  const url = new URL(req.url!, `http://${req.headers.host}`);
+  const { searchParams } = url;
 
-  if (path === PATH_ECHO_BODY) {
+  const status = searchParams.get("status");
+  if (status) {
+    res.statusCode = parseInt(status, 10);
+  }
+
+  const headers = searchParams.getAll("header");
+  for (const header of headers) {
+    const delimiter = header.indexOf(":");
+    const name = header.slice(0, delimiter);
+    const value = header.slice(delimiter + 1);
+
+    try {
+      res.setHeader(name.trim(), value.trim());
+    } catch (err) {
+      if (err instanceof Error) {
+        logPrimary(err.message);
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  if (searchParams.has("echo")) {
     await sendResponse(res, req, req.headers["content-type"] ?? "text/plain; charset=utf-8");
     return;
   }
 
   req.on("end", async () => {
-    let body: string | Readable = "OK";
+    let body: string | Readable =
+      searchParams.get("body") || STATUS_CODES[res.statusCode] || "Unknown";
 
-    // TODO: Use query string instead of path segments to allow for combinations
-    if (path) {
-      if (path.startsWith(PATH_PRINT_PATH)) {
-        body = path.substring(PATH_PRINT_PATH.length);
-      } else if (path.startsWith(PATH_SLEEP_HEADERS)) {
-        await setTimeout(parseInt(path.substring(PATH_SLEEP_HEADERS.length), 10));
-      } else if (path.startsWith(PATH_SLEEP_BODY)) {
-        body = createDelayedReadable(parseInt(path.substring(PATH_SLEEP_BODY.length), 10), body);
-      } else if (path.startsWith(PATH_STATUS)) {
-        res.statusCode = parseInt(path.substring(PATH_STATUS.length), 10);
-        body = STATUS_CODES[res.statusCode] || "Unknown";
-      } else if (path.startsWith(PATH_HEADER)) {
-        const [name, value] = path.substring(PATH_HEADER.length).split("/");
-        try {
-          res.setHeader(decodeURIComponent(name!), decodeURIComponent(value!));
-        } catch (err) {
-          if (err instanceof Error) {
-            logPrimary(err.message);
-          }
-        }
-      }
+    const delayHeaders = searchParams.get("delay-headers");
+    if (delayHeaders) {
+      await setTimeout(parseInt(delayHeaders, 10));
+    }
+
+    const delayBody = searchParams.get("delay-body");
+    if (delayBody) {
+      body = createDelayedReadable(parseInt(delayBody, 10), body);
     }
 
     await sendResponse(res, body, "text/plain; charset=utf-8");
@@ -106,7 +109,7 @@ async function sendResponse(res: ServerResponse, content: Readable | string, con
   }
 
   // write("") sends headers immediately, without waiting for first chunk
-  // TODO: Could make this conditional on PATH_SLEEP_BODY
+  // TODO: Could make this conditional on `?delay-body`
   res.writeHead(res.statusCode).write("");
 
   try {
