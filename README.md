@@ -42,6 +42,7 @@ npm start -- [http|https|tcp] [port]
 | Request path               | Respond with...                                                 |
 | -------------------------- | --------------------------------------------------------------- |
 | `/status/:code`            | Status `:code`                                                  |
+| `/header/:name/:value`     | Status 200 with header :name and :value added                   |
 | `/sleep/headers/:duration` | Status 200 and body after `:duration` milliseconds              |
 | `/sleep/body/:duration`    | Status 200 immediately, and body after `:duration` milliseconds |
 | `/print/:message`          | Status 200 with body set to `:message`                          |

@@ -8,6 +8,7 @@ import { createBrotliCompress, createDeflate, createGzip } from "node:zlib";
 import { logPrimary, logSecondary } from "./util/log.js";
 
 const PATH_STATUS = "/status/";
+const PATH_HEADER = "/header/";
 const PATH_SLEEP_BODY = "/sleep/body/";
 const PATH_SLEEP_HEADERS = "/sleep/headers/";
 const PATH_PRINT_PATH = "/print/";
@@ -55,6 +56,7 @@ async function handleRequest(res: ServerResponse) {
   req.on("end", async () => {
     let body: string | Readable = "OK";
 
+    // TODO: Use query string instead of path segments to allow for combinations
     if (path) {
       if (path.startsWith(PATH_PRINT_PATH)) {
         body = path.substring(PATH_PRINT_PATH.length);
@@ -65,6 +67,15 @@ async function handleRequest(res: ServerResponse) {
       } else if (path.startsWith(PATH_STATUS)) {
         res.statusCode = parseInt(path.substring(PATH_STATUS.length), 10);
         body = STATUS_CODES[res.statusCode] || "Unknown";
+      } else if (path.startsWith(PATH_HEADER)) {
+        const [name, value] = path.substring(PATH_HEADER.length).split("/");
+        try {
+          res.setHeader(decodeURIComponent(name!), decodeURIComponent(value!));
+        } catch (err) {
+          if (err instanceof Error) {
+            logPrimary(err.message);
+          }
+        }
       }
     }
 
