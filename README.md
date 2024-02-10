@@ -39,23 +39,22 @@ npm start -- [http|https|tcp] [port]
 
 ### `http` and `https` modes
 
-| Request path               | Respond with...                                                 |
-| -------------------------- | --------------------------------------------------------------- |
-| `/status/:code`            | Status `:code`                                                  |
-| `/header/:name/:value`     | Status 200 with header :name and :value added                   |
-| `/sleep/headers/:duration` | Status 200 and body after `:duration` milliseconds              |
-| `/sleep/body/:duration`    | Status 200 immediately, and body after `:duration` milliseconds |
-| `/print/:message`          | Status 200 with body set to `:message`                          |
-| `/echo`                    | Status 200 with body set to request body                        |
-| `/*`                       | Status 200                                                      |
+| Request query string parameter | Purpose                                                                                                                          |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| `?status={code}`               | Set response status code                                                                                                         |
+| `?header={name}:{value}`       | Add response header. Can be specified multiple times to add multiple headers.                                                    |
+| `?delay-headers={duration}`    | Delay (in milliseconds) before sending response headers                                                                          |
+| `?delay-body={duration}`       | Delay (in milliseconds) before sending response body                                                                             |
+| `?body={message}`              | Set response body                                                                                                                |
+| `?echo`                        | Send response body equal to request body, chunkwise<br>_Note: `delay-headers` and `delay-body` are ignored when this is enabled_ |
 
-Supports compressed responses (`br`, `gzip`, `deflate`) according to `Accept-Encoding` request
+Also supports compressed responses (`br`, `gzip`, `deflate`) according to `Accept-Encoding` request
 header.
 
 e.g.
 
 ```sh
-$ curl http://localhost:8080/sleep/2000
+$ curl "http://localhost:8080/?delay-headers=2000&status=503&body=Oh%20no!"
 ```
 
 ### `tcp` mode
