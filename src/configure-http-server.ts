@@ -1,16 +1,16 @@
-import { STATUS_CODES, type IncomingMessage, type Server, type ServerResponse } from "node:http";
+import { IncomingMessage, Server, ServerResponse, STATUS_CODES } from "node:http";
 import { Socket } from "node:net";
-import { PassThrough, Readable, type Transform } from "node:stream";
+import { PassThrough, Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { setTimeout } from "node:timers/promises";
 import { createBrotliCompress, createDeflate, createGzip } from "node:zlib";
-
 import { logPrimary, logSecondary } from "./util/log.js";
 
-const RESPONSE_HEADERS = {
+const DEFAULT_RESPONSE_HEADERS = {
+  "Content-Type": "text/plain; charset=utf-8",
   Vary: "Accept-Encoding",
 };
-const RESPONSE_HEADERS_ENTRIES = Object.entries(RESPONSE_HEADERS);
+const DEFAULT_RESPONSE_HEADERS_ENTRIES = Object.entries(DEFAULT_RESPONSE_HEADERS);
 
 function createDelayedReadable(delay: number, value: any): Readable {
   return Readable.from([setTimeout(delay).then(() => value)]);
@@ -46,6 +46,8 @@ async function handleRequest(res: ServerResponse) {
     res.statusCode = parseInt(status, 10);
   }
 
+  DEFAULT_RESPONSE_HEADERS_ENTRIES.forEach(([name, value]) => res.setHeader(name, value));
+
   const headers = searchParams.getAll("header");
   for (const header of headers) {
     const delimiter = header.indexOf(":");
@@ -64,7 +66,10 @@ async function handleRequest(res: ServerResponse) {
   }
 
   if (searchParams.has("echo")) {
-    await sendResponse(res, req, req.headers["content-type"] ?? "text/plain; charset=utf-8");
+    if (req.headers["content-type"]) {
+      res.setHeader("Content-Type", req.headers["content-type"]);
+    }
+    await sendResponse(res, req);
     return;
   }
 
@@ -82,15 +87,12 @@ async function handleRequest(res: ServerResponse) {
       body = createDelayedReadable(parseInt(delayBody, 10), body);
     }
 
-    await sendResponse(res, body, "text/plain; charset=utf-8");
+    await sendResponse(res, body);
   });
 }
 
-async function sendResponse(res: ServerResponse, content: Readable | string, contentType: string) {
+async function sendResponse(res: ServerResponse, content: Readable | string) {
   const { req } = res;
-
-  RESPONSE_HEADERS_ENTRIES.forEach(([name, value]) => res.setHeader(name, value));
-  res.setHeader("Content-Type", contentType);
 
   const [contentEncoding, encodeTransform] = parseAcceptEncoding(req);
 
