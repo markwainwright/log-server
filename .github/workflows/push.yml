@@ -20,7 +20,7 @@ jobs:
       - name: Test
         run: npm test
 
-  build:
+  typecheck:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,4 +33,4 @@ jobs:
       - name: Install
         run: npm ci
       - name: Build
-        run: npm run build
+        run: npm run check
