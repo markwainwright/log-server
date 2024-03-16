@@ -1,7 +1,6 @@
-.tap
+.tsimp
 certs/*
 !certs/.gitkeep
 coverage
 dist
 node_modules
-
