@@ -12,7 +12,7 @@ export function formatAddress(address: AddressInfo | string | null, protocol?: s
 
   const formattedProtocol = protocol ? `${protocol}://` : "";
 
-  if (address.family === "IPv6") {
+  if (address.family.toLowerCase() === "ipv6") {
     return `${formattedProtocol}[${address.address}]:${address.port}`;
   }
 
