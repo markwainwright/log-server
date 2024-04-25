@@ -3,12 +3,12 @@
 A Node.js HTTP, HTTPS, or TCP server that:
 
 - logs incoming connections and requests in a readable way
-- allows response behaviour to be customized on a per-request basis (see below)
+- allows response behaviour to be customized per request (see below)
 
 ![Screenshot](doc/screenshot.png)
 
 The second column is a counter of TCP connections, making it easier to reason about which data came
-in over which connection, for example to troubleshoot HTTP keep alive.
+in over which connection.
 
 ## Install
 
@@ -20,8 +20,15 @@ npm ci
 
 1. [Install mkcert](https://github.com/FiloSottile/mkcert?tab=readme-ov-file#installation)
 
-2. ```sh
+1. Create local CA:
+
+   ```sh
    mkcert -install
+   ```
+
+1. Create a certificate:
+
+   ```sh
    cd certs
    mkcert localhost 127.0.0.1
    ```
@@ -39,14 +46,14 @@ npm start -- [http|https|tcp] [port]
 
 ### `http` and `https` modes
 
-| Request query string parameter | Purpose                                                                                                                          |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| `?status={code}`               | Set response status code                                                                                                         |
-| `?header={name}:{value}`       | Add response header. Can be specified multiple times to add multiple headers.                                                    |
-| `?delay-headers={duration}`    | Delay (in milliseconds) before sending response headers                                                                          |
-| `?delay-body={duration}`       | Delay (in milliseconds) before sending response body                                                                             |
-| `?body={message}`              | Set response body                                                                                                                |
-| `?echo`                        | Send response body equal to request body, chunkwise<br>_Note: `delay-headers` and `delay-body` are ignored when this is enabled_ |
+| Request query parameter     | Response behaviour                                                                                                               |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `?status={code}`            | Set response status code                                                                                                         |
+| `?header={name}:{value}`    | Add response header. Can be specified multiple times to add multiple headers.                                                    |
+| `?delay-headers={duration}` | Delay (in milliseconds) before sending response headers                                                                          |
+| `?delay-body={duration}`    | Delay (in milliseconds) before sending response body                                                                             |
+| `?body={message}`           | Set response body                                                                                                                |
+| `?echo`                     | Send response body equal to request body, chunkwise<br>_Note: `delay-headers` and `delay-body` are ignored when this is enabled_ |
 
 Also supports compressed responses (`br`, `gzip`, `deflate`) according to `Accept-Encoding` request
 header.
@@ -54,7 +61,7 @@ header.
 e.g.
 
 ```sh
-$ curl "http://localhost:8080/?delay-headers=2000&status=503&body=Oh%20no!"
+$ curl -i "http://localhost:8080/?delay-headers=2000&delay-body=1000&status=503&body=Oh%20no!"
 ```
 
 ### `tcp` mode
