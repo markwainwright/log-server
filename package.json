@@ -13,24 +13,17 @@
     "check": "tsc --noEmit",
     "build": "tsc --project tsconfig.build.json",
     "start": "node --import=tsimp/import src/index.ts",
-    "start:watch": "node --import=tsimp/import --watch src/index.ts",
-    "test": "c8 --all ava",
-    "test:watch": "ava --watch"
+    "start:watch": "node --watch --import=tsimp/import src/index.ts",
+    "test": "node --test --test-reporter spec --import=tsimp/import test/*.test.ts test/**/*.test.ts",
+    "test:watch": "node --test --watch --import=tsimp/import test/*.test.ts test/**/*.test.ts",
+    "test:coverage": "c8 --all --src src npm test",
+    "test:ci": "c8 --check-coverage --100 --src src npm test"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.11.28",
-    "ava": "^6.1.2",
     "c8": "^9.1.0",
     "tsimp": "^2.0.11",
     "typescript": "^5.4.2"
-  },
-  "ava": {
-    "extensions": {
-      "ts": "module"
-    },
-    "nodeArguments": [
-      "--import=tsimp/import"
-    ]
   }
 }
