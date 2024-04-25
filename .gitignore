@@ -1,4 +1,3 @@
-.tsimp
 certs/*
 !certs/.gitkeep
 coverage
