@@ -1,4 +1,4 @@
-FROM node:20.11.0-alpine AS base
+FROM node:20.12.2-alpine AS base
 USER node
 WORKDIR /home/node/app
 
