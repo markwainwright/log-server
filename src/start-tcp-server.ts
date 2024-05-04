@@ -2,7 +2,7 @@ import { createServer, type Socket } from "node:net";
 import { setTimeout } from "node:timers/promises";
 
 import { formatAddress } from "./format-address.js";
-import { AsyncIterableQueue } from "./util/async-iterable-queue.js";
+import { AsyncQueue } from "./util/async-queue.js";
 import { logPrimary, logSecondary } from "./util/log.js";
 
 const COMMAND_PREFIX_PRINT = "print ";
@@ -32,7 +32,7 @@ export function startTcpServer(port = 4444) {
   server.on("connection", async socket => {
     logPrimary("Connection opened", socket);
 
-    const linesQueue = new AsyncIterableQueue<string>();
+    const linesQueue = new AsyncQueue<string>();
 
     socket.on("data", async chunk => {
       const string = chunk.toString("utf-8");
@@ -53,7 +53,7 @@ export function startTcpServer(port = 4444) {
     });
 
     socket.on("close", () => {
-      linesQueue.return();
+      linesQueue.end(); // break the for loop below
       logPrimary("Connection closed", socket);
     });
 
@@ -66,7 +66,6 @@ export function startTcpServer(port = 4444) {
         await socketEnd(socket);
       } else if (line === COMMAND_RST) {
         socket.resetAndDestroy();
-        break;
       }
     }
   });
