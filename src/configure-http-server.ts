@@ -6,11 +6,10 @@ import { setTimeout } from "node:timers/promises";
 import { createBrotliCompress, createDeflate, createGzip } from "node:zlib";
 import { logPrimary, logSecondary } from "./util/log.js";
 
-const DEFAULT_RESPONSE_HEADERS = {
-  "Content-Type": "text/plain; charset=utf-8",
-  Vary: "Accept-Encoding",
-};
-const DEFAULT_RESPONSE_HEADERS_ENTRIES = Object.entries(DEFAULT_RESPONSE_HEADERS);
+const DEFAULT_RESPONSE_HEADERS = new Map([
+  ["Content-Type", "text/plain; charset=utf-8"],
+  ["Vary", "Accept-Encoding"],
+]);
 
 function createDelayedReadable(delay: number, value: any): Readable {
   return Readable.from([setTimeout(delay).then(() => value)]);
@@ -46,22 +45,25 @@ async function handleRequest(res: ServerResponse) {
     res.statusCode = parseInt(status, 10);
   }
 
-  DEFAULT_RESPONSE_HEADERS_ENTRIES.forEach(([name, value]) => res.setHeader(name, value));
-
-  const headers = searchParams.getAll("header");
-  for (const header of headers) {
+  for (const header of searchParams.getAll("header")) {
     const delimiter = header.indexOf(":");
-    const name = header.slice(0, delimiter);
-    const value = header.slice(delimiter + 1);
+    const name = header.slice(0, delimiter).trim();
+    const value = header.slice(delimiter + 1).trim();
 
     try {
-      res.setHeader(name.trim(), value.trim());
+      res.appendHeader(name, value);
     } catch (err) {
       if (err instanceof Error) {
         logPrimary(err.message);
       } else {
         throw err;
       }
+    }
+  }
+
+  for (const [name, value] of DEFAULT_RESPONSE_HEADERS) {
+    if (!res.hasHeader(name)) {
+      res.setHeader(name, value);
     }
   }
 
