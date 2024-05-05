@@ -10,8 +10,8 @@
   },
   "type": "module",
   "scripts": {
-    "check": "tsc --noEmit",
     "build": "tsc --project tsconfig.build.json",
+    "check": "tsc --noEmit",
     "start": "node --import=tsx/esm src/index.ts",
     "start:watch": "node --watch --import=tsx/esm src/index.ts",
     "test": "node --test --test-reporter spec --import tsx/esm test/*.test.ts test/**/*.test.ts",
@@ -20,12 +20,13 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.12.7",
+    "@types/node": "^20.12.8",
     "c8": "^9.1.0",
-    "tsx": "^4.7.2",
+    "tsx": "^4.9.1",
     "typescript": "^5.4.5"
   },
   "c8": {
+    "100": true,
     "all": true,
     "include": [
       "src/**/*.ts"
@@ -33,7 +34,6 @@
     "exclude": [
       "src/index.ts"
     ],
-    "check-coverage": true,
-    "100": true
+    "check-coverage": true
   }
 }
