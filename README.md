@@ -80,3 +80,49 @@ e.g.
 ```sh
 $ printf "print hello\nsleep 2000\nprint  world\nsleep 1000\nfin" | nc localhost 4444
 ```
+
+## Development
+
+Run and restart when files change:
+
+```sh
+npm run start:watch
+```
+
+Check types:
+
+```sh
+npm run check
+```
+
+Build to `dist/`:
+
+```sh
+npm run build
+```
+
+### Testing
+
+Enable HTTPS server tests:
+
+```sh
+export NODE_EXTRA_CA_CERTS="$(mkcert -CAROOT)/rootCA.pem"
+```
+
+Run tests:
+
+```sh
+npm test
+```
+
+Run tests and watch for changes:
+
+```sh
+npm run test:watch
+```
+
+Run tests, generate coverage report, and exit with non-zero status if coverage is below 100%:
+
+```sh
+npm run test:coverage
+```

@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { createServer } from "node:https";
+import { createServer, type Server } from "node:https";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -10,7 +10,7 @@ import { logPrimary } from "./util/log.js";
 
 const thisDir = dirname(fileURLToPath(import.meta.url));
 
-export async function startHttpsServer(port = 8443) {
+export async function startHttpsServer(port?: number): Promise<Server> {
   const [key, cert] = await Promise.all(
     ["localhost+1-key.pem", "localhost+1.pem"].map(filename =>
       readFile(resolve(thisDir, "../certs", filename), "utf8")
@@ -23,4 +23,6 @@ export async function startHttpsServer(port = 8443) {
   configureHttpsServer(server);
 
   server.listen(port, () => logPrimary(`Listening on ${formatAddress(server.address(), "https")}`));
+
+  return server;
 }
