@@ -18,14 +18,14 @@ const { mode, port } = parseArgs(process.argv);
 
 switch (mode) {
   case "http":
-    startHttpServer(port);
+    startHttpServer(port || 8080);
     break;
 
   case "https":
-    await startHttpsServer(port);
+    await startHttpsServer(port || 8443);
     break;
 
   case "tcp":
-    startTcpServer(port);
+    startTcpServer(port || 4444);
     break;
 }

@@ -1,4 +1,4 @@
-import { createServer, type Socket } from "node:net";
+import { createServer, type Server, type Socket } from "node:net";
 import { setTimeout } from "node:timers/promises";
 
 import { formatAddress } from "./format-address.js";
@@ -26,7 +26,7 @@ function socketEnd(socket: Socket) {
   return new Promise<void>(socket.end.bind(socket));
 }
 
-export function startTcpServer(port = 4444) {
+export function startTcpServer(port?: number): Server {
   const server = createServer();
 
   server.on("connection", async socket => {
@@ -71,4 +71,6 @@ export function startTcpServer(port = 4444) {
   });
 
   server.listen(port, () => logPrimary(`Listening on ${formatAddress(server.address())}`));
+
+  return server;
 }

@@ -16,8 +16,7 @@
     "start:watch": "node --watch --import=tsx/esm src/index.ts",
     "test": "node --test --test-reporter spec --import tsx/esm test/*.test.ts test/**/*.test.ts",
     "test:watch": "node --test --watch --import=tsx/esm test/*.test.ts test/**/*.test.ts",
-    "test:coverage": "c8 --all --src src npm test",
-    "test:ci": "c8 --check-coverage --100 --src src npm test"
+    "test:coverage": "c8 npm test"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
@@ -25,5 +24,16 @@
     "c8": "^9.1.0",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5"
+  },
+  "c8": {
+    "all": true,
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "src/index.ts"
+    ],
+    "check-coverage": true,
+    "100": true
   }
 }
