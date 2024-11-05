@@ -1,7 +1,7 @@
 {
   "name": "log-server",
-  "version": "0.1.0",
   "description": "HTTP/HTTPS/TCP debug server that logs incoming requests in a human-readable way, and allows response behaviour to be customized",
+  "version": "0.1.0",
   "author": "Mark Wainwright",
   "license": "MIT",
   "repository": {
@@ -20,9 +20,9 @@
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
-    "@types/node": "^20.16.11",
+    "@types/node": "^22.9.0",
     "c8": "^10.1.2",
-    "tsx": "^4.19.1",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   },
   "c8": {

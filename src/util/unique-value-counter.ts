@@ -39,7 +39,12 @@ export class UniqueValueCounter<V> {
     }
 
     if (this.#map.size === this.#maxValues) {
-      this.#map.delete(this.#map.keys().next().value);
+      const keyToEvict = this.#map.keys().next().value;
+
+      if (keyToEvict) {
+        this.#map.delete(keyToEvict);
+      }
+
       this.#evictedValueCount++;
     }
 
