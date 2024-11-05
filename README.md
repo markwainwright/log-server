@@ -16,7 +16,7 @@ in over which connection.
 npm ci
 ```
 
-### Enable HTTPS support
+### Enable HTTPS support (optional)
 
 1. [Install mkcert](https://github.com/FiloSottile/mkcert?tab=readme-ov-file#installation)
 
@@ -41,6 +41,12 @@ npm start -- [http|https|tcp] [port]
 
 - Mode defaults to `http`
 - Port defaults to 8080 in `http` mode, 8443 in `https` mode, or 4444 in `tcp` mode
+
+### Docker
+
+```sh
+HTTPS_PORT=443 docker compose run log-server-https
+```
 
 ## Customizing response behaviour
 
