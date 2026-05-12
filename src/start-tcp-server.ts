@@ -27,7 +27,7 @@ function socketEnd(socket: Socket) {
 }
 
 export function startTcpServer(port?: number): Server {
-  const server = createServer();
+  const server = createServer({ allowHalfOpen: true });
 
   server.on("connection", async socket => {
     logPrimary("Connection opened", socket);

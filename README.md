@@ -13,7 +13,7 @@ in over which connection.
 ## Install
 
 ```sh
-npm ci
+pnpm install
 ```
 
 ### Enable HTTPS support (optional)
